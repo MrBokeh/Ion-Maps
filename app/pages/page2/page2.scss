@@ -4,6 +4,11 @@
 
 #mainImage {
     height: 100%;
+    transition: opacity 1s ease-in-out;
+}
+
+#mainImage.show {
+    opacity: 1;
 }
 
 #address {
