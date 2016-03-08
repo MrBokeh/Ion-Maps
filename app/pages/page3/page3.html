@@ -1,0 +1,44 @@
+<ion-navbar primary *navbar>
+    <ion-title>
+        Directions
+    </ion-title>
+</ion-navbar>
+
+<ion-content padding class="page3">
+
+    <ion-card>
+        <ion-card-header>
+            Directions
+        </ion-card-header>
+        <ion-card-content>
+
+            <ion-item>
+                <ion-input #start [value]="startPosition" type="text" placeholder="From"></ion-input>
+            </ion-item>
+
+            <ion-item>
+                <ion-input #end type="text" placeholder="To"></ion-input>
+            </ion-item>
+
+        </ion-card-content>
+        <ion-item>
+            <button primary clear item-left (click)="_setCurrent()">
+                <ion-icon name="position"></ion-icon>
+                <div>Current Location</div>
+            </button>
+        </ion-item>
+    </ion-card>
+
+    <div style="width:100%; height: 300px;" id="map"></div>
+
+    <ion-list no-lines>
+        <ion-item *ngFor="#direction of directions">
+            <div [innerHTML]="direction.instructions"></div>
+        </ion-item>
+    </ion-list>
+
+</ion-content>
+
+<button id="goButton" (click)="go(start.value, end.value)" fab fab-bottom fab-right secondary>
+    <ion-icon name="navigate"></ion-icon>
+</button>
