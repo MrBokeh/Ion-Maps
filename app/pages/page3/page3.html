@@ -6,7 +6,7 @@
 
 <ion-content padding class="page3">
 
-    <ion-card>
+    <ion-card [hidden]="navigating">
         <ion-card-header>
             Directions
         </ion-card-header>
@@ -17,21 +17,29 @@
             </ion-item>
 
             <ion-item>
-                <ion-input #end type="text" placeholder="To"></ion-input>
+                <ion-input #end [value]="endPosition" type="text" placeholder="To"></ion-input>
             </ion-item>
 
         </ion-card-content>
         <ion-item>
-            <button primary clear item-left (click)="_setCurrent()">
+            <button primary clear item-right (click)="_setCurrent()">
                 <ion-icon name="position"></ion-icon>
                 <div>Current Location</div>
             </button>
+            
+            <button primary clear item-left (click)="startSearch()">
+                <div>Search Locations</div>
+            </button>
         </ion-item>
     </ion-card>
+    
+    <button id="done" [hidden]="!navigating" primary block (click)="done()">
+        End Navigation
+    </button>
 
     <div style="width:100%; height: 300px;" id="map"></div>
 
-    <ion-list no-lines>
+    <ion-list id="list" no-lines>
         <ion-item *ngFor="#direction of directions">
             <div [innerHTML]="direction.instructions"></div>
         </ion-item>
