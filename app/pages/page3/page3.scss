@@ -20,6 +20,11 @@
       animation-name: fadeIn;
   }
   
+  #travelTime {
+      font-size: 120%;
+      margin-bottom: 3%;
+  }
+  
   @keyframes fadeIn {
     from {
         opacity: 0;
