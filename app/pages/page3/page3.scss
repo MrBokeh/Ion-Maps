@@ -25,6 +25,17 @@
       margin-bottom: 3%;
   }
   
+  #weather {
+      font-size: 120%;
+      margin-bottom: 3%;
+  }
+  
+  #share {
+      float: right;
+      font-size: 2rem;
+      z-index: 99999;
+  }
+  
   @keyframes fadeIn {
     from {
         opacity: 0;

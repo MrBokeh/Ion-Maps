@@ -13,6 +13,7 @@ export class Page3 implements OnInit {
     public startPosition: string;
     public endPosition: string;
     public timeToTravel: string;
+    public weather: string;
     public navigating: boolean;
     directionsService: any;
     public directions: string[];
@@ -69,10 +70,16 @@ export class Page3 implements OnInit {
                         map: map,
                         directions: response
                     });
-                    
+
                     this.navigating = true;
                     this.timeToTravel = response.routes[0].legs[0].duration.text;
-                    
+
+                    this.http.get(`http://api.openweathermap.org/data/2.5/weather?lat=${response.routes[0].legs[0].end_location.lat()}&lon=${response.routes[0].legs[0].end_location.lng()}&APPID=4c67ab875dc69f9b7b056986b80992c3`)
+                        .map(res => res.json())
+                        .subscribe(data => {
+                            console.log(data);
+                            this.weather = data.weather[0].description;
+                        })
                 }
                 else {
                     let alert = Alert.create({
@@ -87,7 +94,7 @@ export class Page3 implements OnInit {
             }
         );
     }
-    
+
     done() {
         this._setCurrent();
         this.navigating = false;
@@ -120,13 +127,13 @@ export class Page3 implements OnInit {
                                 center: { lat: position.coords.latitude, lng: position.coords.longitude },
                                 zoom: 8
                             });
-                            
+
                             let request = {
                                 location: { lat: position.coords.latitude, lng: position.coords.longitude },
                                 radius: "400",
                                 query: data.Search
                             }
-                            
+
                             let service = new google.maps.places.PlacesService(map);
                             service.textSearch(request, (results, status) => {
                                 if (status == google.maps.places.PlacesServiceStatus.OK) {
