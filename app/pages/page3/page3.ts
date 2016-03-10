@@ -12,6 +12,7 @@ export class Page3 implements OnInit {
 
     public startPosition: string;
     public endPosition: string;
+    public timeToTravel: string;
     public navigating: boolean;
     directionsService: any;
     public directions: string[];
@@ -70,6 +71,7 @@ export class Page3 implements OnInit {
                     });
                     
                     this.navigating = true;
+                    this.timeToTravel = response.routes[0].legs[0].duration.text;
                     
                 }
                 else {

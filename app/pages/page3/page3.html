@@ -37,6 +37,8 @@
     <button id="done" [hidden]="!navigating" primary block (click)="done()">
         End Navigation
     </button>
+    
+    <div [hidden]="!navigating">Travel Time: {{timeToTravel}}</div>
 
     <div style="width:100%; height: 300px;" id="map">
         Loading map...
