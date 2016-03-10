@@ -74,12 +74,20 @@ export class Page3 implements OnInit {
                     this.navigating = true;
                     this.timeToTravel = response.routes[0].legs[0].duration.text;
 
+                    TTS.speak(`You will arrive at your destination in ${this.timeToTravel}`);
+
                     this.http.get(`http://api.openweathermap.org/data/2.5/weather?lat=${response.routes[0].legs[0].end_location.lat()}&lon=${response.routes[0].legs[0].end_location.lng()}&APPID=4c67ab875dc69f9b7b056986b80992c3`)
                         .map(res => res.json())
                         .subscribe(data => {
                             console.log(data);
                             this.weather = data.weather[0].description;
                         })
+
+                    /*navigator.geolocation.watchPosition((position) => {
+                        let steps = this.directions;
+                        
+                        if (position.coords.latitude === )
+                    })*/
                 }
                 else {
                     let alert = Alert.create({
@@ -101,7 +109,7 @@ export class Page3 implements OnInit {
         this.directions = null;
         this.endPosition = null;
     }
-    
+
     share(desti: string) {
         window.plugins.socialsharing.share(desti, 'Come meet me!')
     }
