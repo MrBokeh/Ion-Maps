@@ -99,6 +99,11 @@ export class Page3 implements OnInit {
         this._setCurrent();
         this.navigating = false;
         this.directions = null;
+        this.endPosition = null;
+    }
+    
+    share(desti: string) {
+        window.plugins.socialsharing.share(desti, 'Come meet me!')
     }
 
     startSearch() {

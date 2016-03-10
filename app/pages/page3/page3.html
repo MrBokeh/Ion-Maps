@@ -23,8 +23,13 @@
         </ion-card-content>
         <ion-item>
             <button primary clear item-right (click)="_setCurrent()">
-                <ion-icon name="position"></ion-icon>
-                <div>Current Location</div>
+                <ion-icon name="person"></ion-icon>
+                <div>Center</div>
+            </button>
+            
+            <button primary clear item-right (click)="share(end.value)">
+                <ion-icon name="share"></ion-icon>
+                <div>Share</div>
             </button>
             
             <button primary clear item-left (click)="startSearch()">
