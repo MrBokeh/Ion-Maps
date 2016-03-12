@@ -8,11 +8,11 @@ import 'rxjs/add/operator/map';
     templateUrl: 'build/pages/page1/page1.html',
 })
 export class Page1 implements OnInit {
-    
+
     ngOnInit() {
         this._snapshot();
     }
-    
+
     public picSource: string;
     public loading: boolean;
     public address: string;
@@ -26,16 +26,16 @@ export class Page1 implements OnInit {
     private _snapshot() {
         this.loading = true;
         navigator.geolocation.getCurrentPosition((position) => {
-            this.picSource = `https://maps.googleapis.com/maps/api/streetview?size=1000x1000&location=${position.coords.latitude},${position.coords.longitude}&fov=90&heading=235&pitch=10&key=AIzaSyCRLbd9d9sOTljJc3R_M7dMg23WXqhMw8M`;
-            document.querySelector("#mainImage").classList.add("show");
-            this.http.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.coords.latitude},${position.coords.longitude}&key=AIzaSyCRLbd9d9sOTljJc3R_M7dMg23WXqhMw8M`)
-            .map(res => res.json())
-            .subscribe(data => {
-                this.address = data.results[0].formatted_address;
-            })
             this.loading = false;
+            const panorama = new google.maps.StreetViewPanorama(
+                document.getElementById('mountPoint'),
+                {
+                    position: { lat: position.coords.latitude, lng: position.coords.longitude },
+                    pov: { heading: 165, pitch: 0 },
+                    zoom: 1
+                });
         });
-        
+
     }
 
 }

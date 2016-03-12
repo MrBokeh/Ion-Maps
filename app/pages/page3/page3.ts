@@ -17,6 +17,8 @@ export class Page3 implements OnInit {
     public navigating: boolean;
     directionsService: any;
     public directions: string[];
+    private results: Object[];
+    private watch: any;
 
     ngOnInit() {
         this._setCurrent();
@@ -51,7 +53,7 @@ export class Page3 implements OnInit {
             zoom: 8
         });
 
-        var directionsRequest = {
+        let directionsRequest = {
             origin: start,
             destination: end,
             travelMode: google.maps.DirectionsTravelMode.DRIVING,
@@ -71,6 +73,9 @@ export class Page3 implements OnInit {
                         directions: response
                     });
 
+                    let trafficLayer = new google.maps.TrafficLayer();
+                    trafficLayer.setMap(map);
+
                     this.navigating = true;
                     this.timeToTravel = response.routes[0].legs[0].duration.text;
 
@@ -83,11 +88,21 @@ export class Page3 implements OnInit {
                             this.weather = data.weather[0].description;
                         })
 
-                    /*navigator.geolocation.watchPosition((position) => {
-                        let steps = this.directions;
-                        
-                        if (position.coords.latitude === )
-                    })*/
+                    //work in progress
+                    this.watch = navigator.geolocation.watchPosition((position) => {
+                        const marker = new google.maps.Marker({
+                            position: { lat: position.coords.latitude, lng: position.coords.longitude },
+                            icon: {
+                                path: google.maps.SymbolPath.CIRCLE,
+                                scale: 5
+                            },
+                            map: map
+                        })
+
+                        console.log(position);
+                    })
+                    //
+                    //
                 }
                 else {
                     let alert = Alert.create({
@@ -108,6 +123,7 @@ export class Page3 implements OnInit {
         this.navigating = false;
         this.directions = null;
         this.endPosition = null;
+        navigator.geolocation.clearWatch(this.watch);
     }
 
     share(desti: string) {
@@ -148,13 +164,48 @@ export class Page3 implements OnInit {
                             }
 
                             let service = new google.maps.places.PlacesService(map);
-                            service.textSearch(request, (results, status) => {
-                                if (status == google.maps.places.PlacesServiceStatus.OK) {
-                                    console.log(results);
-                                    this.endPosition = results[0].formatted_address;
-                                }
-                            });
+
+                            let searchResults = new Promise((resolve, reject) => {
+                                service.textSearch(request, (results, status) => {
+                                    if (status == google.maps.places.PlacesServiceStatus.OK) {
+                                        console.log(results);
+                                        resolve(results);
+                                    }
+                                });
+                            })
+
+                            searchResults.then((val: any) => {
+                                this.results = val;
+
+                                let alert = Alert.create();
+                                alert.setTitle('Results: closest to farthest');
+
+                                this.results.forEach((result: any) => {
+                                    alert.addInput({
+                                        type: 'radio',
+                                        label: result.name,
+                                        value: result.formatted_address,
+                                    })
+                                })
+
+                                alert.addButton('Cancel');
+                                alert.addButton({
+                                    text: 'Ok',
+                                    handler: data => {
+                                        console.log(data);
+                                        this.endPosition = data;
+                                    }
+                                });
+                                this.nav.present(alert);
+                            })
+                                .catch((reason) => {
+                                    console.log(reason);
+                                })
+
                         });
+
+
+
                     }
                 }
             ]
