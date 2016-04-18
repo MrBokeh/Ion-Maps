@@ -102,8 +102,6 @@ export class Page3 implements OnInit {
 
                         console.log(position);
                     })
-                    //
-                    //
                 }
                 else {
                     let alert = Alert.create({

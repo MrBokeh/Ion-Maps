@@ -1,4 +1,4 @@
-import {Page} from 'ionic-angular';
+import {Page, Alert, NavController} from 'ionic-angular';
 import {Http} from "angular2/http";
 import {OnInit} from "angular2/core";
 import 'rxjs/add/operator/map';
@@ -18,8 +18,9 @@ export class Page1 implements OnInit {
     public loading: boolean;
     public address: string;
 
-    constructor(public http: Http) {
+    constructor(public http: Http, public nav: NavController) {
         this.http = http;
+        this.nav = nav;
         this.picSource = "";
         this.loading = false;
     }
@@ -40,14 +41,37 @@ export class Page1 implements OnInit {
     }
 
     public share() {
-        navigator.geolocation.getCurrentPosition((position) => {
-            this.http.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.coords.latitude},${position.coords.longitude}&key=AIzaSyBAbBrkBVD3QrQ7hmfair6o1BCoJDfREuA`)
-                .map(res => res.json())
-                .subscribe(data => {
-                    console.log(data.results[0].formatted_address);
-                    window.plugins.socialsharing.share(data.results[0].formatted_address, 'Come meet me!')
-                })
+
+        let confirm = Alert.create({
+            title: 'Share your current location?',
+            message: 'Are you sure you would like to share your current location?',
+            buttons: [
+                {
+                    text: 'Disagree',
+                    handler: () => {
+                        console.log('Disagree clicked');
+                    }
+                },
+                {
+                    text: 'Agree',
+                    handler: () => {
+                        console.log('Agree clicked');
+
+                        navigator.geolocation.getCurrentPosition((position) => {
+                            this.http.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.coords.latitude},${position.coords.longitude}&key=AIzaSyBAbBrkBVD3QrQ7hmfair6o1BCoJDfREuA`)
+                                .map(res => res.json())
+                                .subscribe(data => {
+                                    console.log(data.results[0].formatted_address);
+                                    window.plugins.socialsharing.share(data.results[0].formatted_address, 'Come meet me!')
+                                })
+                        });
+                        
+                    }
+                }
+            ]
         });
+
+        this.nav.present(confirm);
     }
 
 }
