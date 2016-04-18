@@ -49,72 +49,83 @@ export class Page3 implements OnInit {
 
     go(start: string, end: string) {
 
-        let map = new google.maps.Map(document.getElementById('map'), {
-            center: { lat: -34.397, lng: 150.644 },
-            zoom: 8
-        });
+        if (end !== undefined) {
 
-        let directionsRequest = {
-            origin: start,
-            destination: end,
-            travelMode: google.maps.DirectionsTravelMode.DRIVING,
-            unitSystem: google.maps.UnitSystem.METRIC
-        };
+            let map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: -34.397, lng: 150.644 },
+                zoom: 8
+            });
 
-        this.directionsService.route(
-            directionsRequest,
-            (response, status) => {
-                console.log(response);
+            let directionsRequest = {
+                origin: start,
+                destination: end,
+                travelMode: google.maps.DirectionsTravelMode.DRIVING,
+                unitSystem: google.maps.UnitSystem.METRIC
+            };
 
-                this.directions = response.routes[0].legs[0].steps;
+            this.directionsService.route(
+                directionsRequest,
+                (response, status) => {
+                    console.log(response);
 
-                if (status == google.maps.DirectionsStatus.OK) {
-                    new google.maps.DirectionsRenderer({
-                        map: map,
-                        directions: response
-                    });
+                    this.directions = response.routes[0].legs[0].steps;
 
-                    let trafficLayer = new google.maps.TrafficLayer();
-                    trafficLayer.setMap(map);
+                    if (status == google.maps.DirectionsStatus.OK) {
+                        new google.maps.DirectionsRenderer({
+                            map: map,
+                            directions: response
+                        });
 
-                    this.navigating = true;
-                    this.timeToTravel = response.routes[0].legs[0].duration.text;
+                        let trafficLayer = new google.maps.TrafficLayer();
+                        trafficLayer.setMap(map);
 
-                    TTS.speak(`You will arrive at your destination in ${this.timeToTravel}`);
+                        this.navigating = true;
+                        this.timeToTravel = response.routes[0].legs[0].duration.text;
 
-                    this.http.get(`http://api.openweathermap.org/data/2.5/weather?lat=${response.routes[0].legs[0].end_location.lat()}&lon=${response.routes[0].legs[0].end_location.lng()}&APPID=4c67ab875dc69f9b7b056986b80992c3`)
-                        .map(res => res.json())
-                        .subscribe(data => {
-                            console.log(data);
-                            this.weather = data.weather[0].description;
+                        TTS.speak(`You will arrive at your destination in ${this.timeToTravel}`);
+
+                        this.http.get(`http://api.openweathermap.org/data/2.5/weather?lat=${response.routes[0].legs[0].end_location.lat()}&lon=${response.routes[0].legs[0].end_location.lng()}&APPID=4c67ab875dc69f9b7b056986b80992c3`)
+                            .map(res => res.json())
+                            .subscribe(data => {
+                                console.log(data);
+                                this.weather = data.weather[0].description;
+                            })
+
+                        //work in progress
+                        this.watch = navigator.geolocation.watchPosition((position) => {
+                            const marker = new google.maps.Marker({
+                                position: { lat: position.coords.latitude, lng: position.coords.longitude },
+                                icon: {
+                                    path: google.maps.SymbolPath.CIRCLE,
+                                    scale: 5
+                                },
+                                map: map
+                            })
+
+                            console.log(position);
                         })
+                    }
+                    else {
+                        let alert = Alert.create({
+                            title: 'Error',
+                            subTitle: 'Error retrieving directions, please try again',
+                            buttons: ['Ok']
+                        });
+                        this.nav.present(alert);
+                    }
 
-                    //work in progress
-                    this.watch = navigator.geolocation.watchPosition((position) => {
-                        const marker = new google.maps.Marker({
-                            position: { lat: position.coords.latitude, lng: position.coords.longitude },
-                            icon: {
-                                path: google.maps.SymbolPath.CIRCLE,
-                                scale: 5
-                            },
-                            map: map
-                        })
 
-                        console.log(position);
-                    })
                 }
-                else {
-                    let alert = Alert.create({
-                        title: 'Error',
-                        subTitle: 'Error retrieving directions, please try again',
-                        buttons: ['Ok']
-                    });
-                    this.nav.present(alert);
-                }
-
-
-            }
-        );
+            );
+        }
+        else {
+            let alert = Alert.create({
+                title: "Error",
+                subTitle: "You must choose a destination first!",
+                buttons: ["Ok"]
+            })
+            this.nav.present(alert);
+        }
     }
 
     done() {
@@ -228,8 +239,6 @@ export class Page3 implements OnInit {
                                     text: 'Ok',
                                     handler: data => {
                                         console.log(data);
-
-                                        //console.log(data.photos[0].getUrl())
                                         this.endPosition = data.formatted_address;
                                     }
                                 });
