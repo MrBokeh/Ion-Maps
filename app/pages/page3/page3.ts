@@ -2,6 +2,7 @@ import {Page, Alert, NavController} from 'ionic-angular';
 import {Http} from "angular2/http";
 import {OnInit} from "angular2/core";
 import 'rxjs/add/operator/map';
+import {Toast} from "ionic-native";
 
 declare var google;
 
@@ -33,7 +34,7 @@ export class Page3 implements OnInit {
 
     private _setCurrent() {
         navigator.geolocation.getCurrentPosition((position) => {
-            this.http.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.coords.latitude},${position.coords.longitude}&key=AIzaSyCRLbd9d9sOTljJc3R_M7dMg23WXqhMw8M`)
+            this.http.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.coords.latitude},${position.coords.longitude}&key=AIzaSyBAbBrkBVD3QrQ7hmfair6o1BCoJDfREuA`)
                 .map(res => res.json())
                 .subscribe(data => {
                     this.startPosition = data.results[0].formatted_address;
@@ -127,7 +128,41 @@ export class Page3 implements OnInit {
     }
 
     share(desti: string) {
-        window.plugins.socialsharing.share(desti, 'Come meet me!')
+        console.log(desti);
+        let confirm = Alert.create({
+            title: 'Share your destination?',
+            message: 'Are you sure you would like to share your destination?',
+            buttons: [
+                {
+                    text: 'Disagree',
+                    handler: () => {
+                        console.log('Disagree clicked');
+                    }
+                },
+                {
+                    text: 'Agree',
+                    handler: () => {
+                        console.log('Agree clicked');
+
+                        if (desti !== undefined) {
+                            window.plugins.socialsharing.share(desti, 'Come meet me!')
+                        }
+                        else {
+                            
+                            Toast.show("Choose destination first", "short", "bottom").subscribe(
+                                toast => {
+                                    console.log(toast);
+                                }
+                            )
+                            
+                        }
+                        
+                    }
+                }
+            ]
+        });
+
+        this.nav.present(confirm);
     }
 
     startSearch() {
@@ -177,13 +212,15 @@ export class Page3 implements OnInit {
                             searchResults.then((val: any) => {
                                 this.results = val;
 
+                                console.log(this.results);
+
                                 let alert = Alert.create();
                                 alert.setTitle('Results: closest to farthest');
 
                                 this.results.forEach((result: any) => {
                                     alert.addInput({
                                         type: 'radio',
-                                        label: result.name,
+                                        label: `${result.name}, ${result.formatted_address}`,
                                         value: result.formatted_address,
                                     })
                                 })
