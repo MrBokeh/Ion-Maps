@@ -65,7 +65,7 @@ export class Page1 implements OnInit {
                                     window.plugins.socialsharing.share(data.results[0].formatted_address, 'Come meet me!')
                                 })
                         });
-                        
+
                     }
                 }
             ]

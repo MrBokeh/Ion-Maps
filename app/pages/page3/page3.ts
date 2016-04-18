@@ -146,15 +146,15 @@ export class Page3 implements OnInit {
                             window.plugins.socialsharing.share(desti, 'Come meet me!')
                         }
                         else {
-                            
+
                             Toast.show("Choose destination first", "short", "bottom").subscribe(
                                 toast => {
                                     console.log(toast);
                                 }
                             )
-                            
+
                         }
-                        
+
                     }
                 }
             ]
@@ -219,7 +219,7 @@ export class Page3 implements OnInit {
                                     alert.addInput({
                                         type: 'radio',
                                         label: `${result.name}, ${result.formatted_address}`,
-                                        value: result.formatted_address,
+                                        value: result,
                                     })
                                 })
 
@@ -228,7 +228,9 @@ export class Page3 implements OnInit {
                                     text: 'Ok',
                                     handler: data => {
                                         console.log(data);
-                                        this.endPosition = data;
+
+                                        //console.log(data.photos[0].getUrl())
+                                        this.endPosition = data.formatted_address;
                                     }
                                 });
                                 this.nav.present(alert);
