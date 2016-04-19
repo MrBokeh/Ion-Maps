@@ -4,6 +4,8 @@ import {OnInit} from "angular2/core";
 import 'rxjs/add/operator/map';
 import {Toast} from "ionic-native";
 
+import {SearchPage} from "../page3/search-page";
+
 declare var google;
 
 @Page({
@@ -47,7 +49,8 @@ export class Page3 implements OnInit {
         });
     }
 
-    go(start: string, end: string) {
+    go(start: string) {
+        let end = document.querySelector("#endPositionInput").firstElementChild.value;
 
         if (end !== undefined) {
 
@@ -222,8 +225,12 @@ export class Page3 implements OnInit {
                                 this.results = val;
 
                                 console.log(this.results);
+                                
+                                let endInput = <HTMLInputElement>document.querySelector("#endPositionInput");
+                                
+                                this.nav.push(SearchPage, {results: this.results, position: endInput});
 
-                                let alert = Alert.create();
+                                /*let alert = Alert.create();
                                 alert.setTitle('Results: closest to farthest');
 
                                 this.results.forEach((result: any) => {
@@ -242,7 +249,8 @@ export class Page3 implements OnInit {
                                         this.endPosition = data.formatted_address;
                                     }
                                 });
-                                this.nav.present(alert);
+                                this.nav.present(alert);*/
+                                
                             })
                                 .catch((reason) => {
                                     console.log(reason);

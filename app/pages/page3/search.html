@@ -1,0 +1,21 @@
+<ion-navbar primary *navbar>
+    <ion-title>
+        Search Results
+    </ion-title>
+</ion-navbar>
+
+<ion-content>
+    <h2 padding>From closest to farthest</h2>
+    <ion-list>
+        <button (click)="choose(location.formatted_address)" ion-item *ngFor="#location of locations">
+            <ion-avatar item-left>
+                <img src="{{location.icon}}">
+            </ion-avatar>
+            <h2>{{location.name}}</h2>
+            <h4>{{location.formatted_address}}</h4>
+            <h4 *ngIf="location.rating">Rating: {{location.rating}}</h4>
+            <h4 *ngIf="location.price_level">Price Level: {{location.price_level}}</h4>
+            <button item-right clear primary (click)="getPhotos(location.photos)">Photos</button>
+        </button>
+    </ion-list>
+</ion-content>

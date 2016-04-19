@@ -17,7 +17,7 @@
             </ion-item>
 
             <ion-item>
-                <ion-input #end [value]="endPosition" type="text" placeholder="To"></ion-input>
+                <ion-input #end [value]="endPosition" type="text" placeholder="To" id="endPositionInput"></ion-input>
             </ion-item>
 
         </ion-card-content>
@@ -59,6 +59,6 @@
 
 </ion-content>
 
-<button id="goButton" (click)="go(start.value, end.value)" fab fab-bottom fab-right secondary>
+<button id="goButton" (click)="go(start.value)" fab fab-bottom fab-right secondary>
     <ion-icon name="navigate"></ion-icon>
 </button>
