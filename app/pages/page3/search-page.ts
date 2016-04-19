@@ -70,4 +70,5 @@ class MyModal {
     close() {
         this.viewCtrl.dismiss();
     }
+    
 }

@@ -42,10 +42,13 @@ export class Page3 implements OnInit {
                     this.startPosition = data.results[0].formatted_address;
                 })
 
-            let map = new google.maps.Map(document.getElementById('map'), {
+            const map = new google.maps.Map(document.getElementById('map'), {
                 center: { lat: position.coords.latitude, lng: position.coords.longitude },
                 zoom: 8
             });
+            
+            const trafficLayer = new google.maps.TrafficLayer();
+            trafficLayer.setMap(map);
         });
     }
 
@@ -54,10 +57,12 @@ export class Page3 implements OnInit {
 
         if (end !== undefined) {
 
-            let map = new google.maps.Map(document.getElementById('map'), {
+            const map = new google.maps.Map(document.getElementById('map'), {
                 center: { lat: -34.397, lng: 150.644 },
                 zoom: 8
-            });
+            });           
+            const trafficLayer = new google.maps.TrafficLayer();
+            trafficLayer.setMap(map);
 
             let directionsRequest = {
                 origin: start,
@@ -199,10 +204,12 @@ export class Page3 implements OnInit {
                     handler: data => {
                         console.log(data);
                         navigator.geolocation.getCurrentPosition((position) => {
-                            let map = new google.maps.Map(document.getElementById('map'), {
+                            const map = new google.maps.Map(document.getElementById('map'), {
                                 center: { lat: position.coords.latitude, lng: position.coords.longitude },
                                 zoom: 8
                             });
+                            const trafficLayer = new google.maps.TrafficLayer();
+                            trafficLayer.setMap(map);
 
                             let request = {
                                 location: { lat: position.coords.latitude, lng: position.coords.longitude },
