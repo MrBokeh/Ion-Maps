@@ -22,10 +22,12 @@ export class Page3 implements OnInit {
     public directions: string[];
     private results: Object[];
     private watch: any;
+    public noDestination: boolean;
 
     ngOnInit() {
         this._setCurrent();
         this.navigating = false;
+        this.noDestination = true;
     }
 
     constructor(public http: Http, public nav: NavController) {
@@ -247,6 +249,8 @@ export class Page3 implements OnInit {
                                 let endInput = <HTMLInputElement>document.querySelector("#endPositionInput");
 
                                 this.nav.push(SearchPage, { results: this.results, position: endInput });
+                                
+                                this.noDestination = false;
 
                             })
                                 .catch((reason) => {

@@ -16,7 +16,7 @@
                 <ion-input #start [value]="startPosition" type="text" placeholder="From"></ion-input>
             </ion-item>
 
-            <ion-item>
+            <ion-item [hidden]="noDestination">
                 <ion-input #end [value]="endPosition" type="text" placeholder="To" id="endPositionInput"></ion-input>
             </ion-item>
 
