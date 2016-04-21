@@ -61,7 +61,7 @@ export class Page3 implements OnInit {
 
             const map = new google.maps.Map(document.getElementById('map'), {
                 center: { lat: -34.397, lng: 150.644 },
-                zoom: 8
+                zoom: 11
             });
             const trafficLayer = new google.maps.TrafficLayer();
             trafficLayer.setMap(map);
@@ -154,6 +154,7 @@ export class Page3 implements OnInit {
         this.navigating = false;
         this.directions = null;
         this.endPosition = null;
+        this.noDestination = true;
         navigator.geolocation.clearWatch(this.watch);
     }
 
