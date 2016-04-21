@@ -3,7 +3,12 @@ import {NgZone} from "angular2/core";
 
 
 @Page({
-    templateUrl: "build/pages/page3/search.html"
+    templateUrl: "build/pages/page3/search.html",
+    styles: [`
+        .toolbar {
+            box-shadow: 0 0 4px rgba(0,0,0,0.78);
+        }
+    `]
 })
 export class SearchPage {
 

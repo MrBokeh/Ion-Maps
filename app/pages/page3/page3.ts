@@ -236,27 +236,6 @@ export class Page3 implements OnInit {
                                 let endInput = <HTMLInputElement>document.querySelector("#endPositionInput");
                                 
                                 this.nav.push(SearchPage, {results: this.results, position: endInput});
-
-                                /*let alert = Alert.create();
-                                alert.setTitle('Results: closest to farthest');
-
-                                this.results.forEach((result: any) => {
-                                    alert.addInput({
-                                        type: 'radio',
-                                        label: `${result.name}, ${result.formatted_address}`,
-                                        value: result,
-                                    })
-                                })
-
-                                alert.addButton('Cancel');
-                                alert.addButton({
-                                    text: 'Ok',
-                                    handler: data => {
-                                        console.log(data);
-                                        this.endPosition = data.formatted_address;
-                                    }
-                                });
-                                this.nav.present(alert);*/
                                 
                             })
                                 .catch((reason) => {
