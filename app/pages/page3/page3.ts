@@ -4,7 +4,7 @@ import {OnInit} from "angular2/core";
 import 'rxjs/add/operator/map';
 import {Toast} from "ionic-native";
 
-import {SearchPage} from "../page3/search-page";
+import {SearchPage} from "../searchPage/search-page";
 
 declare var google;
 
@@ -160,40 +160,42 @@ export class Page3 implements OnInit {
 
     share(desti: string) {
         console.log(desti);
-        let confirm = Alert.create({
-            title: 'Share your destination?',
-            message: 'Are you sure you would like to share your destination?',
-            buttons: [
-                {
-                    text: 'Disagree',
-                    handler: () => {
-                        console.log('Disagree clicked');
-                    }
-                },
-                {
-                    text: 'Agree',
-                    handler: () => {
-                        console.log('Agree clicked');
 
-                        if (desti !== undefined) {
-                            window.plugins.socialsharing.share(desti, 'Come meet me!')
+            let confirm = Alert.create({
+                title: 'Share your destination?',
+                message: 'Are you sure you would like to share your destination?',
+                buttons: [
+                    {
+                        text: 'Disagree',
+                        handler: () => {
+                            console.log('Disagree clicked');
                         }
-                        else {
+                    },
+                    {
+                        text: 'Agree',
+                        handler: () => {
+                            console.log('Agree clicked');
 
-                            Toast.show("Choose destination first", "short", "bottom").subscribe(
-                                toast => {
-                                    console.log(toast);
-                                }
-                            )
+                            if (desti !== undefined) {
+                                window.plugins.socialsharing.share(desti, 'Come meet me!')
+                            }
+                            else {
+
+                                Toast.show("Choose destination first", "short", "bottom").subscribe(
+                                    toast => {
+                                        console.log(toast);
+                                    }
+                                )
+
+                            }
 
                         }
-
                     }
-                }
-            ]
-        });
+                ]
+            });
 
-        this.nav.present(confirm);
+            this.nav.present(confirm);
+        
     }
 
     startSearch() {
@@ -250,7 +252,7 @@ export class Page3 implements OnInit {
                                 let endInput = <HTMLInputElement>document.querySelector("#endPositionInput");
 
                                 this.nav.push(SearchPage, { results: this.results, position: endInput });
-                                
+
                                 this.noDestination = false;
 
                             })

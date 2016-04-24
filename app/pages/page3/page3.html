@@ -27,14 +27,9 @@
                 <div>Center</div>
             </button>
             
-            <button primary clear item-right (click)="share(end.value)">
+            <button primary clear item-left (click)="share(end.value)">
                 <ion-icon name="share"></ion-icon>
                 <div>Share</div>
-            </button>
-            
-            <button primary clear item-left (click)="startSearch()">
-                <ion-icon name="search"></ion-icon>
-                <div>Search</div>
             </button>
      
         </ion-item>
@@ -59,6 +54,10 @@
 
 </ion-content>
 
-<button id="goButton" (click)="go(start.value)" fab fab-bottom fab-right secondary>
+<button id="goButton" *ngIf="noDestination === false" (click)="go(start.value)" fab fab-bottom fab-right secondary>
     <ion-icon name="navigate"></ion-icon>
+</button>
+
+<button id="goButton" *ngIf="noDestination === true"(click)="startSearch()" fab fab-bottom fab-right secondary>
+    <ion-icon name="search"></ion-icon>
 </button>
