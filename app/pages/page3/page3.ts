@@ -1,4 +1,4 @@
-import {Page, Alert, NavController} from 'ionic-angular';
+import {Page, Alert, NavController, Loading} from 'ionic-angular';
 import {Http} from "angular2/http";
 import {OnInit} from "angular2/core";
 import 'rxjs/add/operator/map';
@@ -7,6 +7,7 @@ import {Toast} from "ionic-native";
 import {SearchPage} from "../searchPage/search-page";
 
 declare var google;
+declare var TTS;
 
 @Page({
     templateUrl: 'build/pages/page3/page3.html'
@@ -37,107 +38,136 @@ export class Page3 implements OnInit {
     }
 
     private _setCurrent() {
-        navigator.geolocation.getCurrentPosition((position) => {
-            this.http.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.coords.latitude},${position.coords.longitude}&key=AIzaSyBAbBrkBVD3QrQ7hmfair6o1BCoJDfREuA`)
-                .map(res => res.json())
-                .subscribe(data => {
-                    this.startPosition = data.results[0].formatted_address;
-                })
-
-            const map = new google.maps.Map(document.getElementById('map'), {
-                center: { lat: position.coords.latitude, lng: position.coords.longitude },
-                zoom: 8
-            });
-
-            const trafficLayer = new google.maps.TrafficLayer();
-            trafficLayer.setMap(map);
+        let loading = Loading.create({
+            content: 'Getting Location'
         });
+
+        this.nav.present(loading).then(() => {
+            navigator.geolocation.getCurrentPosition((position) => {
+                this.http.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.coords.latitude},${position.coords.longitude}&key=AIzaSyBAbBrkBVD3QrQ7hmfair6o1BCoJDfREuA`)
+                    .map(res => res.json())
+                    .subscribe(data => {
+                        this.startPosition = data.results[0].formatted_address;
+                    })
+
+                const map = new google.maps.Map(document.getElementById('map'), {
+                    center: { lat: position.coords.latitude, lng: position.coords.longitude },
+                    zoom: 8
+                });
+
+                const trafficLayer = new google.maps.TrafficLayer();
+                trafficLayer.setMap(map);
+
+                loading.dismiss();
+            });
+        })
+
     }
 
     go(start: string) {
         let end = document.querySelector("#endPositionInput").firstElementChild.value;
 
         if (end !== undefined) {
-
-            const map = new google.maps.Map(document.getElementById('map'), {
-                center: { lat: -34.397, lng: 150.644 },
-                zoom: 11
+            let loading = Loading.create({
+                content: 'Getting Directions'
             });
-            const trafficLayer = new google.maps.TrafficLayer();
-            trafficLayer.setMap(map);
 
-            let directionsRequest = {
-                origin: start,
-                destination: end,
-                travelMode: google.maps.DirectionsTravelMode.DRIVING,
-                unitSystem: google.maps.UnitSystem.METRIC
-            };
+            this.nav.present(loading).then(() => {
+                const map = new google.maps.Map(document.getElementById('map'), {
+                    center: { lat: -34.397, lng: 150.644 },
+                    zoom: 11
+                });
+                const trafficLayer = new google.maps.TrafficLayer();
+                trafficLayer.setMap(map);
 
-            this.directionsService.route(
-                directionsRequest,
-                (response, status) => {
-                    console.log(response);
-                    console.log(status);
+                let directionsRequest = {
+                    origin: start,
+                    destination: end,
+                    travelMode: google.maps.DirectionsTravelMode.DRIVING,
+                    unitSystem: google.maps.UnitSystem.METRIC
+                };
 
-                    if (status === "NOT_FOUND") {
-                        let alert = Alert.create({
-                            title: 'Error',
-                            message: 'Error retrieving directions, please try again',
-                            buttons: ['Ok']
-                        });
-                        this.nav.present(alert);
-                        this._setCurrent();
-                    }
-                    else {
-                        this.directions = response.routes[0].legs[0].steps;
+                this.directionsService.route(
+                    directionsRequest,
+                    (response, status) => {
+                        console.log(response);
+                        console.log(status);
 
-                        if (status == google.maps.DirectionsStatus.OK) {
-                            new google.maps.DirectionsRenderer({
-                                map: map,
-                                directions: response
-                            });
-
-                            let trafficLayer = new google.maps.TrafficLayer();
-                            trafficLayer.setMap(map);
-
-                            this.navigating = true;
-                            this.timeToTravel = response.routes[0].legs[0].duration.text;
-
-                            TTS.speak(`You will arrive at your destination in ${this.timeToTravel}`);
-
-                            this.http.get(`http://api.openweathermap.org/data/2.5/weather?lat=${response.routes[0].legs[0].end_location.lat()}&lon=${response.routes[0].legs[0].end_location.lng()}&APPID=4c67ab875dc69f9b7b056986b80992c3`)
-                                .map(res => res.json())
-                                .subscribe(data => {
-                                    console.log(data);
-                                    this.weather = data.weather[0].description;
-                                })
-
-                            //work in progress
-                            this.watch = navigator.geolocation.watchPosition((position) => {
-                                const marker = new google.maps.Marker({
-                                    position: { lat: position.coords.latitude, lng: position.coords.longitude },
-                                    icon: {
-                                        path: google.maps.SymbolPath.CIRCLE,
-                                        scale: 5
-                                    },
-                                    map: map
-                                })
-
-                                console.log(position);
+                        if (status === "NOT_FOUND") {
+                            loading.dismiss().then(() => {
+                                let alert = Alert.create({
+                                    title: 'Error',
+                                    message: 'Error retrieving directions, please try again',
+                                    buttons: ['Ok']
+                                });
+                                this._setCurrent();
+                                this.nav.present(alert);
                             })
                         }
                         else {
-                            let alert = Alert.create({
-                                title: 'Error',
-                                message: 'Error retrieving directions, please try again',
-                                buttons: ['Ok']
-                            });
-                            this.nav.present(alert);
-                        }
-                    }
+                            loading.dismiss();
 
-                }
-            );
+                            this.directions = response.routes[0].legs[0].steps;
+
+                            if (status == google.maps.DirectionsStatus.OK) {
+                                new google.maps.DirectionsRenderer({
+                                    map: map,
+                                    directions: response
+                                });
+
+                                let trafficLayer = new google.maps.TrafficLayer();
+                                trafficLayer.setMap(map);
+
+                                this.navigating = true;
+                                this.timeToTravel = response.routes[0].legs[0].duration.text;
+
+                                TTS.speak(`You will arrive at your destination in ${this.timeToTravel}`);
+
+                                this.http.get(`http://api.openweathermap.org/data/2.5/weather?lat=${response.routes[0].legs[0].end_location.lat()}&lon=${response.routes[0].legs[0].end_location.lng()}&APPID=4c67ab875dc69f9b7b056986b80992c3`)
+                                    .map(res => res.json())
+                                    .subscribe(data => {
+                                        console.log(data);
+                                        this.weather = data.weather[0].description;
+                                    })
+
+                                //work in progress
+                                this.watch = navigator.geolocation.watchPosition((position) => {
+                                    console.log("watch started");
+                                    
+                                    if (marker) {
+                                        marker.setMap(null);
+                                        marker = null;
+                                    }
+                                    
+                                    var marker = new google.maps.Marker({
+                                        position: { lat: position.coords.latitude, lng: position.coords.longitude },
+                                        icon: {
+                                            path: google.maps.SymbolPath.CIRCLE,
+                                            scale: 5
+                                        },
+                                        map: map
+                                    })
+
+                                    console.log(position);
+                                })
+                            }
+                            else {
+                                loading.dismiss().then(() => {
+                                    let alert = Alert.create({
+                                        title: 'Error',
+                                        message: 'Error retrieving directions, please try again',
+                                        buttons: ['Ok']
+                                    });
+                                    this._setCurrent();
+                                    this.nav.present(alert);
+                                })
+                            }
+                        }
+
+                    }
+                );
+            })
+
         }
         else {
             let alert = Alert.create({
@@ -161,41 +191,41 @@ export class Page3 implements OnInit {
     share(desti: string) {
         console.log(desti);
 
-            let confirm = Alert.create({
-                title: 'Share your destination?',
-                message: 'Are you sure you would like to share your destination?',
-                buttons: [
-                    {
-                        text: 'Disagree',
-                        handler: () => {
-                            console.log('Disagree clicked');
-                        }
-                    },
-                    {
-                        text: 'Agree',
-                        handler: () => {
-                            console.log('Agree clicked');
-
-                            if (desti !== undefined) {
-                                window.plugins.socialsharing.share(desti, 'Come meet me!')
-                            }
-                            else {
-
-                                Toast.show("Choose destination first", "short", "bottom").subscribe(
-                                    toast => {
-                                        console.log(toast);
-                                    }
-                                )
-
-                            }
-
-                        }
+        let confirm = Alert.create({
+            title: 'Share your destination?',
+            message: 'Are you sure you would like to share your destination?',
+            buttons: [
+                {
+                    text: 'Disagree',
+                    handler: () => {
+                        console.log('Disagree clicked');
                     }
-                ]
-            });
+                },
+                {
+                    text: 'Agree',
+                    handler: () => {
+                        console.log('Agree clicked');
 
-            this.nav.present(confirm);
-        
+                        if (desti !== undefined) {
+                            window.plugins.socialsharing.share(desti, 'Come meet me!')
+                        }
+                        else {
+
+                            Toast.show("Choose destination first", "short", "bottom").subscribe(
+                                toast => {
+                                    console.log(toast);
+                                }
+                            )
+
+                        }
+
+                    }
+                }
+            ]
+        });
+
+        this.nav.present(confirm);
+
     }
 
     startSearch() {
@@ -219,50 +249,57 @@ export class Page3 implements OnInit {
                     text: 'Search',
                     handler: data => {
                         console.log(data);
-                        navigator.geolocation.getCurrentPosition((position) => {
-                            const map = new google.maps.Map(document.getElementById('map'), {
-                                center: { lat: position.coords.latitude, lng: position.coords.longitude },
-                                zoom: 8
-                            });
-                            const trafficLayer = new google.maps.TrafficLayer();
-                            trafficLayer.setMap(map);
 
-                            let request = {
-                                location: { lat: position.coords.latitude, lng: position.coords.longitude },
-                                radius: "400",
-                                query: data.Search
-                            }
-
-                            let service = new google.maps.places.PlacesService(map);
-
-                            let searchResults = new Promise((resolve, reject) => {
-                                service.textSearch(request, (results, status) => {
-                                    if (status == google.maps.places.PlacesServiceStatus.OK) {
-                                        console.log(results);
-                                        resolve(results);
-                                    }
-                                });
-                            })
-
-                            searchResults.then((val: any) => {
-                                this.results = val;
-
-                                console.log(this.results);
-
-                                let endInput = <HTMLInputElement>document.querySelector("#endPositionInput");
-
-                                this.nav.push(SearchPage, { results: this.results, position: endInput });
-
-                                this.noDestination = false;
-
-                            })
-                                .catch((reason) => {
-                                    console.log(reason);
-                                })
-
+                        let loading = Loading.create({
+                            content: 'Please wait...'
                         });
 
+                        this.nav.present(loading).then(() => {
+                            navigator.geolocation.getCurrentPosition((position) => {
+                                const map = new google.maps.Map(document.getElementById('map'), {
+                                    center: { lat: position.coords.latitude, lng: position.coords.longitude },
+                                    zoom: 8
+                                });
+                                const trafficLayer = new google.maps.TrafficLayer();
+                                trafficLayer.setMap(map);
 
+                                let request = {
+                                    location: { lat: position.coords.latitude, lng: position.coords.longitude },
+                                    radius: "400",
+                                    query: data.Search
+                                }
+
+                                let service = new google.maps.places.PlacesService(map);
+
+                                let searchResults = new Promise((resolve, reject) => {
+                                    service.textSearch(request, (results, status) => {
+                                        if (status == google.maps.places.PlacesServiceStatus.OK) {
+                                            console.log(results);
+                                            resolve(results);
+                                        }
+                                    });
+                                })
+
+                                searchResults.then((val: any) => {
+                                    this.results = val;
+
+                                    console.log(this.results);
+
+                                    let endInput = <HTMLInputElement>document.querySelector("#endPositionInput");
+
+                                    loading.dismiss().then(() => {
+                                        this.nav.push(SearchPage, { results: this.results, position: endInput });
+                                        this.noDestination = false;
+                                    })
+
+                                })
+                                    .catch((reason) => {
+                                        loading.dismiss();
+                                        console.log(reason);
+                                    })
+
+                            });
+                        })
 
                     }
                 }

@@ -42,9 +42,7 @@
     <div id="travelTime" [hidden]="!navigating">Travel Time: {{timeToTravel}}</div>
     <div id="weather" [hidden]="!navigating">Weather: {{weather}}</div>
 
-    <div style="width:100%; height: 300px;" id="map">
-        Loading map...
-    </div>
+    <div style="width:100%; height: 300px;" id="map"></div>
     
     <ion-list id="list" no-lines>
         <ion-item *ngFor="#direction of directions">
